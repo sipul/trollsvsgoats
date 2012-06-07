@@ -1,0 +1,11 @@
+package au.edu.unimelb.csse.trollsvsgoats.core.model.units;
+
+public class MegaTroll extends Troll {
+
+    @Override
+    void init() {
+        setSpeed(0.5f);
+        setForce(8);
+    }
+
+}

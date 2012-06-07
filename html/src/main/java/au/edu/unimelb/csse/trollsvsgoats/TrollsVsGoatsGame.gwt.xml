@@ -1,0 +1,11 @@
+<module rename-to='trollsvsgoats'>
+  <inherits name='playn.PlayN'/>
+  <inherits name='tripleplay.TriplePlay'/>
+
+  <source path='core'/>
+  <source path='html'/>
+
+  <public path="resources" />
+
+  <entry-point class='au.edu.unimelb.csse.trollsvsgoats.html.TrollsVsGoatsGameHtml'/>
+</module>
