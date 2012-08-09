@@ -7,5 +7,10 @@ public class FastGoat extends Goat {
         setSpeed(2);
         setForce(2);
     }
+    
+    @Override
+    public String type() {
+        return "fast";
+    }
 
 }

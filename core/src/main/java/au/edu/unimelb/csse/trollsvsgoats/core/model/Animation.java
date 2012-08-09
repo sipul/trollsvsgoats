@@ -9,7 +9,7 @@ public class Animation {
     // A parent image with subimages.
     private Image parentImage;
     private Image[] images;
-    private int frameWidth;
+    private float frameWidth;
     private int frameCount;
     private float frameTime;
     private int frameIndex;

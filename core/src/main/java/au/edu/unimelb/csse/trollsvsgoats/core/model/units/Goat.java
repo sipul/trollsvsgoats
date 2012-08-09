@@ -1,24 +1,28 @@
 package au.edu.unimelb.csse.trollsvsgoats.core.model.units;
 
+import tripleplay.ui.layout.AbsoluteLayout;
+
 public abstract class Goat extends Unit {
 
     @Override
     public void update(float delta) {
-        layer.setTranslation(square.getX(), square.getY());
-        if (state == null)
+        if (state() == null || state().equals(State.REMOVED))
             return;
-        if (state.equals(State.MOVING))
-            layer.setImage(moveAnimation.nextFrame(delta));
-        else if (state.equals(State.PUSHING)) {
+        if (timer() <= 0)
+            parent.add(AbsoluteLayout.at(widget(), square().getX(), square()
+                    .getY()));
+        if (state().equals(State.MOVING))
+            widget().icon.update(moveAnimation.nextFrame(delta));
+        else if (state().equals(State.PUSHING)) {
             if (pushAnimation != null)
-                layer.setImage(pushAnimation.nextFrame(delta));
+                widget().icon.update(pushAnimation.nextFrame(delta));
         }
     }
 
-    @Override
-    public String type() {
-        String name = this.getClass().getSimpleName();
-        return name.substring(0, name.indexOf("Goat")).toLowerCase();
-    }
+    // @Override
+    // public String type() {
+    // String name = this.getClass().getSimpleName();
+    // return name.substring(0, name.indexOf("Goat")).toLowerCase();
+    // }
 
 }

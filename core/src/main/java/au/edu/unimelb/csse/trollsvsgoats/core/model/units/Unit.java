@@ -3,44 +3,49 @@ package au.edu.unimelb.csse.trollsvsgoats.core.model.units;
 import au.edu.unimelb.csse.trollsvsgoats.core.model.Animation;
 import au.edu.unimelb.csse.trollsvsgoats.core.model.Square;
 import playn.core.Image;
-import playn.core.ImageLayer;
-import static playn.core.PlayN.*;
+import tripleplay.ui.Button;
+import tripleplay.ui.Group;
+import tripleplay.ui.layout.AbsoluteLayout;
 
 public abstract class Unit {
     public static enum State {
-        MOVING, PUSHING, REMOVED, GRABBED, BLOCKED
+        MOVING, PUSHING, REMOVED, BLOCKED, JUMPING
     };
 
-    // An unit has a reference to its front unit and back unit.
-    Unit front;
-    Unit back;
+    // An unit has a reference to its front and back unit.
+    private Unit front;
+    private Unit back;
 
     // How many seconds for a unit at normal speed to cover a segment.
-    final static int SEGMENT_TIME = 2;
+    private float movementTime = 2;
 
-    float speed;
-    float force;
+    private float speed;
+    private float force;
 
     // Controls the moving of the unit.
-    float moveDelay;
-    float timer;
+    private float moveDelay;
+    private float timer;
 
     Animation moveAnimation;
     Animation pushAnimation;
-    Image defaultImage;
+    private Image icon;
 
-    ImageLayer layer;
-    Square square;
-    State state;
-    boolean moved;
+    private Button widget;
+    private Square square;
+    private State state;
+    private boolean moved;
+    protected Group parent;
 
     public Unit() {
         init();
-        timer = moveDelay;
+    }
+
+    public void setParent(Group parent) {
+        this.parent = parent;
     }
 
     /**
-     * Sets the speed and force of this unit.
+     * Sets the speed, force and cost of this unit.
      */
     abstract void init();
 
@@ -48,9 +53,15 @@ public abstract class Unit {
         return this.speed;
     }
 
+    public void setMovementTime(float seconds) {
+        this.movementTime = seconds;
+        setSpeed(speed);
+    }
+
     public void setSpeed(float speed) {
         this.speed = speed;
-        moveDelay = SEGMENT_TIME * 1000 / speed;
+        moveDelay = movementTime * 1000 / speed;
+        timer = moveDelay;
         if (moveAnimation != null)
             moveAnimation.setFrameTime(frameTime());
     }
@@ -67,14 +78,15 @@ public abstract class Unit {
         this.force = force;
     }
 
-    public ImageLayer layer() {
-        if (this.layer == null)
-            layer = graphics().createImageLayer();
-        return this.layer;
+    /** The widget contains this unit. */
+    public Button widget() {
+        if (this.widget == null)
+            widget = new Button(icon);
+        return this.widget;
     }
 
-    public void setLayer(ImageLayer layer) {
-        this.layer = layer;
+    public void setLayer(Button layer) {
+        this.widget = layer;
     }
 
     public void setSquare(Square square) {
@@ -98,14 +110,17 @@ public abstract class Unit {
         return 100 / this.speed;
     }
 
+    /** Reset this unit to initial state. */
     public void reset() {
         init();
         this.moved = false;
         this.timer = moveDelay;
         this.front = null;
         this.back = null;
-        layer.setImage(defaultImage != null ? defaultImage : moveAnimation
-                .frame(0));
+        widget.layer.setVisible(true);
+        widget.icon.update(icon != null ? icon : moveAnimation.frame(0));
+        parent.add(AbsoluteLayout
+                .at(widget(), square().getX(), square().getY()));
     }
 
     public float updateTimer(float delta) {
@@ -119,7 +134,7 @@ public abstract class Unit {
 
     public void setMoveAnimation(Animation animation) {
         this.moveAnimation = animation;
-        layer().setImage(animation.frame(0));
+        widget.icon.update(animation.frame(0));
     }
 
     public void setPushAnimation(Animation animaiton) {
@@ -132,6 +147,8 @@ public abstract class Unit {
 
     public void setFront(Unit unit) {
         this.front = unit;
+        if (unit != null)
+            unit.back = this;
     }
 
     public Unit back() {
@@ -141,23 +158,15 @@ public abstract class Unit {
     public void setBack(Unit unit) {
         this.back = unit;
         if (unit != null)
-            unit.setFront(this);
+            unit.front = this;
     }
 
     public void removeFront() {
-        Unit front = this.front;
-        if (front.front != null) {
-            front.front.setBack(this);
-        }
-        this.setFront(front.front);
+        this.setFront(this.front.front);
     }
 
     public void removeBack() {
-        Unit back = this.back;
-        if (back.back != null) {
-            back.back.setFront(this);
-        }
-        this.setBack(back.back);
+        this.setBack(this.back.back);
     }
 
     public State state() {
@@ -173,15 +182,22 @@ public abstract class Unit {
      * it's the first frame of the move animation.
      */
     public void setDefaultImage(Image image) {
-        this.defaultImage = image;
-        layer.setImage(image);
+        this.icon = image;
+        widget.icon.update(image);
     }
 
+    /** Handles collision with the front unit. */
     public void notifyColliedWithFront() {
     };
 
+    /** Handles collision with the back unit. */
     public void notifyColliedWithBack() {
     };
+
+    /** Special ability of this unit. */
+    public String ability() {
+        return "";
+    }
 
     public abstract void update(float delta);
 

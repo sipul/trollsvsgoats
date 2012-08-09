@@ -6,12 +6,12 @@ public class FastTroll extends Troll {
     void init() {
         setSpeed(2);
         setForce(1);
+        setCost(15);
     }
-
+    
     @Override
-    public void notifyColliedWithFront() {
-        // TODO Auto-generated method stub
-
+    public String type() {
+        return "fast";
     }
 
 }

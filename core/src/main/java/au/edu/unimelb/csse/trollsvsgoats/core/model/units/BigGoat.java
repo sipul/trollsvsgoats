@@ -8,4 +8,9 @@ public class BigGoat extends Goat {
         setForce(8);
     }
 
+    @Override
+    public String type() {
+        return "big";
+    }
+
 }

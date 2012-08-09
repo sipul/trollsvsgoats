@@ -6,6 +6,12 @@ public class NormalTroll extends Troll {
     void init() {
         setSpeed(1);
         setForce(2);
+        setCost(10);
     }
 
+    @Override
+    public String type() {
+        return "normal";
+    }
+    
 }

@@ -1,17 +1,32 @@
 package au.edu.unimelb.csse.trollsvsgoats.core.model.units;
 
+import tripleplay.ui.layout.AbsoluteLayout;
+
 public abstract class Troll extends Unit {
+
+    private float cost;
+
+    public float cost() {
+        return this.cost;
+    }
+
+    public void setCost(float cost) {
+        this.cost = cost;
+    }
 
     @Override
     public void update(float delta) {
-        layer.setTranslation(square.getX(), square.getY());
-        if (state == null || this.speed == 0)
+        if (state() == null || state().equals(State.REMOVED)
+                || this.speed() == 0)
             return;
-        if (state.equals(State.MOVING))
-            layer.setImage(moveAnimation.nextFrame(delta));
-        else if (state.equals(State.PUSHING)) {
+        if (timer() <= 0)
+            parent.add(AbsoluteLayout.at(widget(), square().getX(), square()
+                    .getY()));
+        if (state().equals(State.MOVING))
+            widget().icon.update(moveAnimation.nextFrame(delta));
+        else if (state().equals(State.PUSHING)) {
             if (pushAnimation != null)
-                layer.setImage(pushAnimation.nextFrame(delta));
+                widget().icon.update(pushAnimation.nextFrame(delta));
         }
     }
 
@@ -19,10 +34,10 @@ public abstract class Troll extends Unit {
         return true;
     }
 
-    @Override
-    public String type() {
-        String name = this.getClass().getSimpleName();
-        return name.substring(0, name.indexOf("Troll")).toLowerCase();
-    }
+    // @Override
+    // public String type() {
+    // String name = this.getClass().getSimpleName();
+    // return name.substring(0, name.indexOf("Troll")).toLowerCase();
+    // }
 
 }

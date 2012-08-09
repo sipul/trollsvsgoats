@@ -3,71 +3,178 @@ package au.edu.unimelb.csse.trollsvsgoats.core;
 import static playn.core.PlayN.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import au.edu.unimelb.csse.trollsvsgoats.core.model.PersistenceClient;
-import au.edu.unimelb.csse.trollsvsgoats.core.view.Level;
-import au.edu.unimelb.csse.trollsvsgoats.core.view.LevelMenu;
-import au.edu.unimelb.csse.trollsvsgoats.core.view.MainMenu;
-import au.edu.unimelb.csse.trollsvsgoats.core.view.View;
-
-import playn.core.Game;
-import playn.core.Image;
-import playn.core.ImageLayer;
-import playn.core.ResourceCallback;
-import playn.core.Sound;
+import playn.core.*;
+import tripleplay.game.ScreenStack;
+import au.edu.unimelb.csse.trollsvsgoats.core.model.*;
+import au.edu.unimelb.csse.trollsvsgoats.core.view.*;
 
 /**
  * Main game interface which updates the game states and views.
  */
 public class TrollsVsGoatsGame implements Game {
 
+    private final View[] screens;
     private PersistenceClient persistence;
-    private Level currentLevel;
-    private View currentView;
-    private int levelIndex;
-    private int maxCompletedLevel = 1;
+    private GameModel model;
+    private String userName;
 
     private Map<String, Image> images = new HashMap<String, Image>();
     private Map<String, Sound> sounds = new HashMap<String, Sound>();
 
     // Views
-    private MainMenu mainMenu = new MainMenu(this);
-    private LevelMenu levelMenu = new LevelMenu(this);
+    private MainScreen mainScreen;
+    private LoadingScreen loadScreen;
+    private ThemeSelScreen themeSelScreen;
+    private LevelSelScreen levelSelScreen;
+    private MessageBox messageBox;
+    private BadgesScreen badgesScreen;
+    private OptionScreen optionScreen;
+    private HelpScreen helpScreen;
 
     public TrollsVsGoatsGame(PersistenceClient persistence) {
         this.persistence = persistence;
+        this.model = new GameModel();
+        screens = new View[] { mainScreen = new MainScreen(this),
+                loadScreen = new LoadingScreen(this),
+                themeSelScreen = new ThemeSelScreen(this),
+                levelSelScreen = new LevelSelScreen(this),
+                new LevelScreen(this), badgesScreen = new BadgesScreen(this),
+                optionScreen = new OptionScreen(this),
+                helpScreen = new HelpScreen(this) };
     }
 
     @Override
     public void init() {
-        graphics().setSize(800, 480);
-        showMainMenu();
+        userName = "LocalTest";
+        populate();
+        stack.push(loadScreen);
+        loadResources();
     }
 
-    public void showMainMenu() {
-        if (currentView != null) {
-            currentView.destroy();
+    /** Load all the images and sounds. */
+    private void loadResources() {
+        AssetWatcher asset = new AssetWatcher(new AssetWatcher.Listener() {
+
+            @Override
+            public void error(Throwable e) {
+                log().error("Error loading asset: " + e.getMessage());
+            }
+
+            @Override
+            public void done() {
+                graphics().setSize(model.width, model.height);
+                stack.replace(mainScreen, ScreenStack.NOOP);
+            }
+        });
+        for (View screen : screens) {
+            if (screen.images() != null) {
+                for (String path : screen.images()) {
+                    Image image = assets().getImage("images/" + path + ".png");
+                    asset.add(image);
+                    images.put(path, image);
+                }
+            }
+            if (screen.sounds() != null) {
+                for (String path : screen.sounds()) {
+                    Sound sound = assets().getSound("sounds/" + path);
+                    asset.add(sound);
+                    sounds.put(path, sound);
+                }
+            }
         }
-        mainMenu.init();
-        graphics().rootLayer().add(mainMenu.layer());
-        currentView = mainMenu;
+
+        asset.start();
     }
 
-    public void showLevelMenu() {
-        if (currentView != null) {
-            currentView.destroy();
+    public void setScreenSize(int width, int height) {
+        graphics().setSize(width, height);
+        persistence.persist(model);
+    }
+
+    /** Grab data from persistence source */
+    public void populate() {
+        persistence.getUserName(new PersistenceClient.Callback<String>() {
+
+            @Override
+            public void onSuccess(String result) {
+                if (result != null)
+                    userName = result;
+            }
+
+            @Override
+            public void onFailure(Throwable caught) {
+                log().error(caught.getMessage());
+            }
+        });
+        persistence.populate(model);
+    }
+
+    /** Save game data to persistence source */
+    public void persist() {
+        persistence.persist(model);
+    }
+
+    public void logTrollsDeployment(List<String> lanes) {
+        persistence.logTrollsDeployment(model.levelIndex(), lanes);
+    }
+
+    public void refreshMainScreen() {
+        mainScreen.wasAdded();
+    }
+
+    public void showThemeSelScreen() {
+        stack.push(themeSelScreen);
+    }
+
+    public void showLevelSelScreen(int index) {
+        model.setThemeIndex(index);
+        stack.push(levelSelScreen);
+    }
+
+    public void showBadgesScreen() {
+        stack.push(badgesScreen);
+    }
+
+    public void showOptionScreen() {
+        stack.push(optionScreen);
+    }
+
+    public void showHelpScreen() {
+        stack.push(helpScreen);
+    }
+
+    public void showMessageBox(View currentScreen, MessageBox messageBox) {
+        closeMessageBox();
+        this.messageBox = messageBox;
+        messageBox.wasAdded();
+        currentScreen.layer.addAt(messageBox.layer(), graphics().width() / 2
+                - messageBox.width() / 2,
+                graphics().height() / 2 - messageBox.height() / 2);
+        messageBox.layer().setDepth(3);
+    }
+
+    public void closeMessageBox() {
+        if (messageBox != null) {
+            messageBox.wasRemoved();
+            messageBox = null;
         }
-        levelMenu.init();
-        graphics().rootLayer().add(levelMenu.layer());
-        currentView = levelMenu;
     }
 
-    public void loadLevel(final int index) {
-        String levelPath = "levels/level_" + String.valueOf(index)
-                + "_demo.txt";
+    public String userName() {
+        return this.userName;
+    }
+
+    public GameModel model() {
+        return this.model;
+    }
+
+    public void loadLevel(final int index, final boolean replace) {
+        String levelPath = "levels/" + model.currentTheme() + "_level_"
+                + String.valueOf(index) + ".txt";
         final TrollsVsGoatsGame game = this;
-        getImage("numbers");
         assets().getText(levelPath, new ResourceCallback<String>() {
 
             @Override
@@ -77,73 +184,108 @@ public class TrollsVsGoatsGame implements Game {
 
             @Override
             public void done(String resource) {
-                if (currentView != null) {
-                    currentView.destroy();
-                }
-                Level level = new Level(game, resource);
-                levelIndex = index;
-                level.init();
-                graphics().rootLayer().add(level.layer());
-                currentLevel = level;
-                currentView = level;
+                game.model().levelStart(index);
+                LevelScreen level = new LevelScreen(game, resource);
+                if (replace)
+                    stack.replace(level, ScreenStack.NOOP);
+                else
+                    stack.push(level, ScreenStack.NOOP);
             }
         });
     }
 
     public void loadNextLevel() {
-        loadLevel(++levelIndex);
+        loadLevel(model.nextLevelIndex(), true);
     }
 
-    // Called when completed the current level, persists the level index.
-    public void levelCompleted() {
-        // TODO
+    /** Called when completed the current level, persists the level index. */
+    public void levelCompleted(int score) {
+        model.levelCompleted(score);
+        persistence.persist(model);
     }
 
-    public int levelIndex() {
-        return this.levelIndex;
+    public void setBadgeAchieve(Badge badge) {
+        persistence.achieveBadge(badge);
     }
 
-    public int maxCompletedLevel() {
-        return this.maxCompletedLevel;
+    /** How long for a unit to cover a segment. */
+    public void setMovementTime(float seconds) {
+        model.setMovementTime(seconds);
+        persistence.persist(model);
+    }
+
+    // TODO Just for cheating
+    public void setLevelScore(int score) {
+        model.setLevelScore(score);
+        persistence.persist(model);
+    }
+
+    // TODO Just for cheating
+    public void increaseMaxLevel() {
+        if (model.maxCompletedLevel() < 6) {
+            model.setMaxCompletedLevel(model.maxCompletedLevel() + 1);
+            model.setLevelDataDirty();
+            persistence.persist(model);
+        }
+    }
+
+    public void decreaseMaxLevel() {
+        if (model.maxCompletedLevel() > 0) {
+            model.setMaxCompletedLevel(model.maxCompletedLevel() - 1);
+            model.setLevelDataDirty();
+            persistence.persist(model);
+        }
     }
 
     /**
-     * Retrieves and caches images in the case of assets service for Java
-     * platform does not do caching. Images should be type of png.
+     * Retrieves images which should be type of png.
      **/
-    public Image getImage(String name) {
-        Image image = null;
-        if ((image = images.get(name)) == null) {
-            image = assets().getImage("images/" + name + ".png");
-            images.put(name, image);
-        }
-        return image;
+    public Image getImage(String path) {
+        return images.get(path);
     }
 
     /**
      * Retrieves and caches sounds.
      **/
-    public Sound getSound(String name) {
-        Sound sound = null;
-        if ((sound = sounds.get(name)) == null) {
-            sound = assets().getSound("sounds/" + name);
-            sounds.put(name, sound);
-        }
-        return sound;
+    public Sound getSound(String path) {
+        return sounds.get(path);
     }
 
     @Override
     public void paint(float alpha) {
-        currentView.paint(alpha);
+        stack.paint(alpha);
+        if (messageBox != null)
+            messageBox.paint(alpha);
     }
 
     @Override
     public void update(float delta) {
-        currentView.update(delta);
+        stack.update(delta);
     }
 
     @Override
     public int updateRate() {
         return 25;
     }
+
+    public ScreenStack stack() {
+        return this.stack;
+    }
+
+    private final ScreenStack stack = new ScreenStack() {
+        @Override
+        protected void handleError(RuntimeException error) {
+            PlayN.log().warn("Screen failure", error);
+        }
+
+        @Override
+        protected Transition defaultPushTransition() {
+            return slide();
+        }
+
+        @Override
+        protected Transition defaultPopTransition() {
+            return slide().right();
+        }
+    };
 }

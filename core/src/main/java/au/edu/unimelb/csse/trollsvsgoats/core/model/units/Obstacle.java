@@ -10,7 +10,7 @@ public class Obstacle extends Unit {
 
     @Override
     public void notifyColliedWithBack() {
-        this.back.setState(State.BLOCKED);
+        this.back().setState(State.BLOCKED);
     }
 
     @Override

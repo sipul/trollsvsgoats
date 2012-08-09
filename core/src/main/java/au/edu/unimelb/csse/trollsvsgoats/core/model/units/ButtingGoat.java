@@ -10,11 +10,21 @@ public class ButtingGoat extends Goat {
 
     @Override
     public void notifyColliedWithFront() {
-        if (this.front instanceof DiggingTroll
-                || this.front instanceof SpittingTroll) {
-            this.front.layer().destroy();
+        if (this.front() instanceof DiggingTroll
+                || this.front() instanceof SpittingTroll) {
+            this.front().widget().layer.destroy();
             removeFront();
         }
+    }
+
+    @Override
+    public String ability() {
+        return "will remove digging and spitting trolls";
+    }
+
+    @Override
+    public String type() {
+        return "butting";
     }
 
 }

@@ -7,5 +7,10 @@ public class LittleGoat extends Goat {
         setSpeed(1);
         setForce(2);
     }
+    
+    @Override
+    public String type() {
+        return "little";
+    }
 
 }

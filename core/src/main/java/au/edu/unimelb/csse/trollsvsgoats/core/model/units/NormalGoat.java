@@ -7,5 +7,10 @@ public class NormalGoat extends Goat {
         setSpeed(1);
         setForce(4);
     }
+    
+    @Override
+    public String type() {
+        return "normal";
+    }
 
 }

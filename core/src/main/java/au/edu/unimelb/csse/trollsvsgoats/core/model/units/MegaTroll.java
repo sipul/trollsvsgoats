@@ -6,6 +6,12 @@ public class MegaTroll extends Troll {
     void init() {
         setSpeed(0.5f);
         setForce(8);
+        setCost(25);
     }
 
+    @Override
+    public String type() {
+        return "mega";
+    }
+    
 }
