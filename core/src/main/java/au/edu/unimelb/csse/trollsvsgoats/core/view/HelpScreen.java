@@ -238,15 +238,15 @@ public class HelpScreen extends View {
         return new String[] {
                 "Each level has a gate in the middle which can be rotated around the pivot.",
                 "Trolls push from the left while goats push from the right.",
-                "Each troll and goat exerts a particular force according to its type.",
-                "The goal is to maintain the equilibrium of the moments caused by both sides." };
+                "The goal is to maintain the equilibrium of the moments caused by both sides",
+                "so as to stop an army of goats from crossing the bridge." };
     }
 
     private String[] deploymentText() {
         return new String[] {
                 "Trolls and goats walk forward at a constant speed once start.",
                 "Before that, you need to deploy trolls on the left side to counter goats.",
-                "The force of a unit is denoted as red bars (blue for speed).",
+                "The strength of a unit is denoted as red bars (blue for speed).",
                 "Try to spend as few trolls as possible to achieve higher score." };
     }
 

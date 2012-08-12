@@ -352,7 +352,7 @@ public class LevelScreen extends View {
                 image = getTileImages(tileSymbol).get(0);
                 Button tile = new Button().addStyles(Style.BACKGROUND
                         .is(Background.blank()));
-                GroupLayer squareLayer = tile.layer;
+                GroupLayer tileLayer = tile.layer;
 
                 switch (tileSymbol) {
                 // A segment of a lane.
@@ -365,7 +365,16 @@ public class LevelScreen extends View {
                     final int _segment = segment;
                     final int _distance = distance;
 
-                    squareLayer.addListener(new Mouse.LayerAdapter() {
+                    // Adds a shim for levels which do not have units on the
+                    // first lane.
+                    if (lane == 1 && distance == 1 && !isTrollSide) {
+                        Image shimImg = getTileImages('g').get(0);
+                        Shim shim = new Shim(0, shimImg.height());
+                        shim.layer.setOrigin(0, shimImg.height());
+                        middlePanel.add(AbsoluteLayout.at(shim, _x, _y));
+                    }
+
+                    tileLayer.addListener(new Mouse.LayerAdapter() {
                         private Square square = new Square(_lane, _segment);
 
                         // Deploy a troll at the square where the
@@ -474,7 +483,7 @@ public class LevelScreen extends View {
                 // Gate.
                 case '|':
                     isTrollSide = false;
-                    squareLayer.setDepth(1);
+                    tileLayer.setDepth(1);
 
                     if (lane == 1 && !hasPivot) {
                         pivotLocation = 0;
@@ -491,7 +500,7 @@ public class LevelScreen extends View {
                 case 'o':
                     hasPivot = true;
                     pivotLocation = lane;
-                    squareLayer.setDepth(2);
+                    tileLayer.setDepth(2);
                     break;
 
                 case 'g':// Little goat.
@@ -533,9 +542,9 @@ public class LevelScreen extends View {
                     goat.setMoveAnimation(moveAnimation);
                     goat.setDefaultImage(image);
 
-                    squareLayer.setOrigin(0, image.height());
-                    squareLayer.setDepth(1);
-                    squareLayer.addListener(new Mouse.LayerAdapter() {
+                    tileLayer.setOrigin(0, image.height());
+                    tileLayer.setDepth(1);
+                    tileLayer.addListener(new Mouse.LayerAdapter() {
                         @Override
                         public void onMouseOver(MotionEvent event) {
                             if (preSelGoat != null)
