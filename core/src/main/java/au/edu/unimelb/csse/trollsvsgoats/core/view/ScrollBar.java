@@ -211,4 +211,10 @@ public class ScrollBar extends Elements<ScrollBar> {
         return this.downButDown;
     }
 
+	@Override
+	protected Class<?> getStyleClass() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

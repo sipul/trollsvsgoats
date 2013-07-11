@@ -77,7 +77,7 @@ public class BadgesScreen extends View {
             else
                 icon = "badge_lock";
             tiles.add(new Group(AxisLayout.horizontal(), Style.HALIGN.left)
-                    .add(new Label(getImage(icon)).setConstraint(Constraints
+                    .add(new Label(getIcon(icon)).setConstraint(Constraints
                             .fixedWidth(ICON_WIDTH)))
                     .add(new Group(AxisLayout.vertical())
                             .add(new Label(badge.displayName())
@@ -93,7 +93,7 @@ public class BadgesScreen extends View {
 
         for (int i = 0; i < tileCount - model.badges().length; i++) {
             tiles.add(new Group(AxisLayout.horizontal(), Style.HALIGN.left)
-                    .add(new Label(getImage("badge_lock"))
+                    .add(new Label(getIcon("badge_lock"))
                             .setConstraint(Constraints.fixedWidth(ICON_WIDTH)))
                     .add(new Group(AxisLayout.vertical()).add(
                             new Label("?").addStyles(Style.FONT.is(font(
@@ -113,8 +113,8 @@ public class BadgesScreen extends View {
 
         final Button up = scroll.upButton();
         final Button down = scroll.downButton();
-        up.addStyles(selOff).icon.update(getImage("scroll_up"));
-        down.addStyles(selOff).icon.update(getImage("scroll_down"));
+        up.addStyles(selOff).icon.update(getIcon("scroll_up"));
+        down.addStyles(selOff).icon.update(getIcon("scroll_down"));
         addButtonListener(up);
         addButtonListener(down);
         if (scrollRange > PAGE_RANGE)
@@ -177,7 +177,7 @@ public class BadgesScreen extends View {
     }
 
     @Override
-    public void update(float delta) {
+    public void update(int delta) {
         if (scroll.isUpButtonDown())
             scroll.scrollUp(BUTTON_SCROLL_DISTANCE);
         else if (scroll.isDownButtonDown())

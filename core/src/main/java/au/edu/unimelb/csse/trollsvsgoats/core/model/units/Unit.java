@@ -5,6 +5,7 @@ import au.edu.unimelb.csse.trollsvsgoats.core.model.Square;
 import playn.core.Image;
 import tripleplay.ui.Button;
 import tripleplay.ui.Group;
+import tripleplay.ui.Icons;
 import tripleplay.ui.layout.AbsoluteLayout;
 
 public abstract class Unit {
@@ -81,7 +82,7 @@ public abstract class Unit {
     /** The widget contains this unit. */
     public Button widget() {
         if (this.widget == null)
-            widget = new Button(icon);
+            widget = new Button(Icons.image(icon));
         return this.widget;
     }
 
@@ -118,7 +119,7 @@ public abstract class Unit {
         this.front = null;
         this.back = null;
         widget.layer.setVisible(true);
-        widget.icon.update(icon != null ? icon : moveAnimation.frame(0));
+        widget.icon.update(icon != null ? Icons.image(icon) : Icons.image(moveAnimation.frame(0)));
         parent.add(AbsoluteLayout
                 .at(widget(), square().getX(), square().getY()));
     }
@@ -134,7 +135,7 @@ public abstract class Unit {
 
     public void setMoveAnimation(Animation animation) {
         this.moveAnimation = animation;
-        widget.icon.update(animation.frame(0));
+        widget.icon.update(Icons.image(animation.frame(0)));
     }
 
     public void setPushAnimation(Animation animaiton) {
@@ -183,7 +184,7 @@ public abstract class Unit {
      */
     public void setDefaultImage(Image image) {
         this.icon = image;
-        widget.icon.update(image);
+        widget.icon.update(Icons.image(image));
     }
 
     /** Handles collision with the front unit. */

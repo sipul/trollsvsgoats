@@ -34,7 +34,7 @@ public class ThemeSelScreen extends View {
                     .maxCompletedLevel() + 1) {
                 themes.add(new Group(AxisLayout.vertical()).add(theme));
                 theme.text.update(null);
-                theme.icon.update(getImage("lock"));
+                theme.icon.update(getIcon("lock"));
                 theme.setEnabled(false);
             } else {
                 themes.add(new Group(AxisLayout.vertical()).add(theme));

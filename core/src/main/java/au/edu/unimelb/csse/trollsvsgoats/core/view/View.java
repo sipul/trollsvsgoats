@@ -2,8 +2,6 @@ package au.edu.unimelb.csse.trollsvsgoats.core.view;
 
 import static playn.core.PlayN.*;
 
-import java.util.List;
-
 import au.edu.unimelb.csse.trollsvsgoats.core.TrollsVsGoatsGame;
 import au.edu.unimelb.csse.trollsvsgoats.core.model.GameModel;
 import playn.core.Font;
@@ -18,6 +16,7 @@ import tripleplay.game.UIAnimScreen;
 import tripleplay.ui.Background;
 import tripleplay.ui.Button;
 import tripleplay.ui.Group;
+import tripleplay.ui.Icon;
 import tripleplay.ui.Label;
 import tripleplay.ui.Root;
 import tripleplay.ui.Shim;
@@ -71,19 +70,19 @@ public abstract class View extends UIAnimScreen {
         root.add(topPanel
                 .add(new Shim(0, TOP_MARGIN))
                 .add(new Group(AxisLayout.horizontal(), Style.HALIGN.left)
-                        .add(this.back = new Button(getImage("back_off"))))
+                        .add(this.back = new Button(getIcon("back_off"))))
                 .add(new Label(title()).addStyles(Style.FONT.is(TITLE_FONT))));
         topPanel.layer.setDepth(1);
         back.setStyles(Style.BACKGROUND.is(Background.blank()));
         back.layer.addListener(new Mouse.LayerAdapter() {
             @Override
             public void onMouseOver(MotionEvent event) {
-                back.icon.update(getImage("back_on"));
+                back.icon.update(getIcon("back_on"));
             }
 
             @Override
             public void onMouseOut(MotionEvent event) {
-                back.icon.update(getImage("back_off"));
+                back.icon.update(getIcon("back_off"));
             }
         });
         back.clicked().connect(backSlot = new UnitSlot() {
@@ -175,6 +174,10 @@ public abstract class View extends UIAnimScreen {
     protected Image getImage(String path) {
         return game.getImage(path);
     }
+    
+    protected Icon getIcon(String path) {
+    	return game.getIcon(path);
+    }
 
     protected void playSound(String name) {
         if (model.isSoundEnabled())
@@ -198,10 +201,5 @@ public abstract class View extends UIAnimScreen {
         iface.destroyRoot(root);
         while (layer.size() > 0)
             layer.get(0).destroy();
-    }
-
-    @Override
-    protected float updateRate() {
-        return 25;
     }
 }

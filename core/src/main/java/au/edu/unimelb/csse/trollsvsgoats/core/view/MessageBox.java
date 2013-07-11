@@ -114,9 +114,9 @@ public class MessageBox extends View {
     }
 
     @Override
-    public void paint(float alpha) {
-        iface.paint(alpha);
-    }
+    public void update(int delta) {
+		iface.update(delta);
+	}
 
     @Override
     protected String title() {

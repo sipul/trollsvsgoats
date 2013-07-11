@@ -3,7 +3,6 @@ package au.edu.unimelb.csse.trollsvsgoats.core.view;
 import static tripleplay.ui.layout.TableLayout.*;
 
 import playn.core.Font;
-import playn.core.PlayN;
 import au.edu.unimelb.csse.trollsvsgoats.core.TrollsVsGoatsGame;
 import react.Function;
 import react.UnitSlot;
@@ -35,7 +34,7 @@ public class OptionScreen extends View {
 
             @Override
             public void onEmit() {
-                if (sound.isSelected()) {
+                if (sound.selected.get()) {
                     sound.addStyles(Style.BACKGROUND.is(butSelBg));
                     sound.text.update("ON");
                     model.setSoundEnabled(true);
@@ -49,7 +48,7 @@ public class OptionScreen extends View {
             }
         });
         if (title.equals("ON")) {
-            sound.setSelected(true);
+        	sound.selected.update(true);
             model.setSoundEnabled(true);
         }
         iface.add(new Label("Sound").addStyles(Style.FONT.is(SUBTITLE_FONT)))
@@ -78,22 +77,25 @@ public class OptionScreen extends View {
                 newToggle("1024 X 720", 120, width() == 1024) };
         for (final ToggleButton toggle : toggles) {
             final String size = toggle.text.get();
+            
             toggle.clicked().connect(new UnitSlot() {
-
                 @Override
                 public void onEmit() {
-                    if (toggle.isSelected()) {
+                    if (toggle.selected.get()) {
                         toggle.addStyles(Style.BACKGROUND.is(butSelBg));
                         if (width() != stringToWidth(size)) {
-                            PlayN.graphics().setSize(stringToWidth(size),
-                                    stringToHeight(size));
+                            //->TODO PlayN.graphics().setSize(stringToWidth(size),
+                            //        stringToHeight(size));
+
+
+                        	game.setScreenSize(stringToWidth(size), stringToHeight(size));
                             game.refreshMainScreen();
                             game.persist();
                             wasAdded();
                         }
                     } else {
                         toggle.addStyles(Style.BACKGROUND.is(butSelBg));
-                        toggle.setSelected(true);
+                        toggle.selected.update(true);
                     }
                 }
 
@@ -117,7 +119,7 @@ public class OptionScreen extends View {
         toggle.addStyles(Style.BACKGROUND.is(butBg),
                 Style.FONT.is(font(Font.Style.PLAIN, 18)));
         if (selected) {
-            toggle.setSelected(true);
+        	toggle.selected.update(true);
             toggle.addStyles(Style.BACKGROUND.is(butSelBg));
         }
         return toggle;

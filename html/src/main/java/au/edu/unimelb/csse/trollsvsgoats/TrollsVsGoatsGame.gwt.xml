@@ -2,6 +2,7 @@
   <inherits name='playn.PlayN'/>
   <inherits name='tripleplay.TriplePlay'/>
   <inherits name='au.edu.unimelb.csse.mugle.Mugle'/>
+  <inherits name='TrollsVsGoatsGameAssets'/>
 
   <source path='core'/>
   <source path='html'/>

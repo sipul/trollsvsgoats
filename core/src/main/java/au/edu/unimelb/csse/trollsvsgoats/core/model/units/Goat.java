@@ -1,5 +1,6 @@
 package au.edu.unimelb.csse.trollsvsgoats.core.model.units;
 
+import tripleplay.ui.Icons;
 import tripleplay.ui.layout.AbsoluteLayout;
 
 public abstract class Goat extends Unit {
@@ -12,10 +13,10 @@ public abstract class Goat extends Unit {
             parent.add(AbsoluteLayout.at(widget(), square().getX(), square()
                     .getY()));
         if (state().equals(State.MOVING))
-            widget().icon.update(moveAnimation.nextFrame(delta));
+        	widget().icon.update(Icons.image(moveAnimation.nextFrame(delta)));
         else if (state().equals(State.PUSHING)) {
             if (pushAnimation != null)
-                widget().icon.update(pushAnimation.nextFrame(delta));
+            	widget().icon.update(Icons.image(pushAnimation.nextFrame(delta)));
         }
     }
 

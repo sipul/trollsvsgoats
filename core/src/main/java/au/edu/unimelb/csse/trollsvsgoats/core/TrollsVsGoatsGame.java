@@ -7,14 +7,24 @@ import java.util.List;
 import java.util.Map;
 
 import playn.core.*;
+import playn.core.util.Callback;
+import playn.core.util.Clock;
 import tripleplay.game.ScreenStack;
+import tripleplay.ui.Background;
+import tripleplay.ui.Icon;
+import tripleplay.ui.Icons;
+import tripleplay.ui.Interface;
+import tripleplay.ui.Root;
+import tripleplay.ui.SimpleStyles;
+import tripleplay.ui.Style;
+import tripleplay.ui.layout.AxisLayout;
 import au.edu.unimelb.csse.trollsvsgoats.core.model.*;
 import au.edu.unimelb.csse.trollsvsgoats.core.view.*;
 
 /**
  * Main game interface which updates the game states and views.
  */
-public class TrollsVsGoatsGame implements Game {
+public class TrollsVsGoatsGame extends Game.Default implements Game {
 
     private final View[] screens;
     private PersistenceClient persistence;
@@ -23,6 +33,7 @@ public class TrollsVsGoatsGame implements Game {
 
     private Map<String, Image> images = new HashMap<String, Image>();
     private Map<String, Sound> sounds = new HashMap<String, Sound>();
+    private Map<String, Icon>  icons = new HashMap<String, Icon>();
 
     // Views
     private MainScreen mainScreen;
@@ -33,8 +44,16 @@ public class TrollsVsGoatsGame implements Game {
     private BadgesScreen badgesScreen;
     private OptionScreen optionScreen;
     private HelpScreen helpScreen;
+    
+    //tripleplay 1.7.2
+    private static final int UPDATE_RATE = 30; // FPS
+    private static final int UPDATE_PERIOD = 1000 / UPDATE_RATE;
+    private final Clock.Source _clock = new Clock.Source(UPDATE_RATE);
+    protected float _lastTime;
+    //
 
     public TrollsVsGoatsGame(PersistenceClient persistence) {
+    	super(UPDATE_PERIOD); // call update every 33ms (30 times per second)
         this.persistence = persistence;
         this.model = new GameModel();
         screens = new View[] { mainScreen = new MainScreen(this),
@@ -65,7 +84,10 @@ public class TrollsVsGoatsGame implements Game {
 
             @Override
             public void done() {
-                graphics().setSize(model.width, model.height);
+                //TODO graphics().setSize(model.width, model.height);
+            	//http://code.google.com/p/playn/source/detail?spec=svn02ad17652134fc1a47d647a9fec2e72bd7a2134b&r=2ee14ffb17a4935e3db3079fd1bcab45831d9105
+            	//issue with html - graphics().ctx().setSize(model.width, model.height);
+            	
                 stack.replace(mainScreen, ScreenStack.NOOP);
             }
         });
@@ -75,6 +97,9 @@ public class TrollsVsGoatsGame implements Game {
                     Image image = assets().getImage("images/" + path + ".png");
                     asset.add(image);
                     images.put(path, image);
+                    
+                    Icon icon = Icons.image(PlayN.assets().getImage("images/" + path + ".png"));
+                    icons.put(path, icon);
                 }
             }
             if (screen.sounds() != null) {
@@ -90,7 +115,9 @@ public class TrollsVsGoatsGame implements Game {
     }
 
     public void setScreenSize(int width, int height) {
-        graphics().setSize(width, height);
+        //TODO graphics().setSize(width, height);
+    	//issue with html - graphics().ctx().setSize(width, height);
+
         persistence.persist(model);
     }
 
@@ -175,22 +202,22 @@ public class TrollsVsGoatsGame implements Game {
         String levelPath = "levels/" + model.currentTheme() + "_level_"
                 + String.valueOf(index) + ".txt";
         final TrollsVsGoatsGame game = this;
-        assets().getText(levelPath, new ResourceCallback<String>() {
-
-            @Override
-            public void error(Throwable err) {
-                log().error(err.getMessage());
-            }
-
-            @Override
-            public void done(String resource) {
-                game.model().levelStart(index);
-                LevelScreen level = new LevelScreen(game, resource);
+        assets().getText(levelPath, new Callback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				game.model().levelStart(index);
+                LevelScreen level = new LevelScreen(game, result);
                 if (replace)
                     stack.replace(level, ScreenStack.NOOP);
                 else
                     stack.push(level, ScreenStack.NOOP);
-            }
+			}
+
+			@Override
+			public void onFailure(Throwable cause) {
+				log().error(cause.getMessage());
+				
+			}
         });
     }
 
@@ -243,6 +270,10 @@ public class TrollsVsGoatsGame implements Game {
     public Image getImage(String path) {
         return images.get(path);
     }
+    
+    public Icon getIcon(String path) {
+    	return icons.get(path);
+    }
 
     /**
      * Retrieves and caches sounds.
@@ -253,19 +284,16 @@ public class TrollsVsGoatsGame implements Game {
 
     @Override
     public void paint(float alpha) {
-        stack.paint(alpha);
+    	_clock.paint(alpha);
+        stack.paint(_clock);
         if (messageBox != null)
-            messageBox.paint(alpha);
+            messageBox.paint(_clock);
     }
 
     @Override
-    public void update(float delta) {
+    public void update(int delta) {
+    	_clock.update(delta);
         stack.update(delta);
-    }
-
-    @Override
-    public int updateRate() {
-        return 25;
     }
 
     public ScreenStack stack() {

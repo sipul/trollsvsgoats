@@ -5,8 +5,8 @@ import static playn.core.PlayN.log;
 
 import playn.core.Font;
 import playn.core.Mouse;
-import playn.core.ResourceCallback;
 import playn.core.Mouse.MotionEvent;
+import playn.core.util.Callback;
 import react.UnitSlot;
 import au.edu.unimelb.csse.trollsvsgoats.core.TrollsVsGoatsGame;
 import tripleplay.ui.Background;
@@ -152,17 +152,12 @@ public class HelpScreen extends View {
         gameHelp.add(new Group(AxisLayout.horizontal().offStretch()).add(texts)
                 .add(AxisLayout.stretch(new Shim(1, 1))).add(navi));
 
-        assets().getText("levels/demo.txt", new ResourceCallback<String>() {
+        assets().getText("levels/demo.txt", new Callback<String>() {
 
-            @Override
-            public void error(Throwable err) {
-                log().error(err.getMessage());
-            }
-
-            @Override
-            public void done(String resource) {
-                model.levelStart(0);
-                demo = new LevelScreen(game, resource);
+        	@Override
+			public void onSuccess(String result) {
+				model.levelStart(0);
+                demo = new LevelScreen(game, result);
                 demo.wasAdded();
                 gameHelp.add(demo.root);
                 demo.root.addStyles(Style.BACKGROUND.is(Background.blank()));
@@ -171,7 +166,12 @@ public class HelpScreen extends View {
                 demo.buttonPanel.childAt(1).setEnabled(false);
                 demo.trollInfoPanel.setConstraint(Constraints.fixedWidth(263));
                 demo.goatInfoPanel.setConstraint(Constraints.fixedWidth(200));
-            }
+			}
+
+			@Override
+			public void onFailure(Throwable cause) {
+				log().error(cause.getMessage());
+			}
         });
         return gameHelp;
     }
@@ -201,7 +201,7 @@ public class HelpScreen extends View {
     }
 
     @Override
-    public void update(float delta) {
+    public void update(int delta) {
         super.update(delta);
         if (demo != null) {
             demo.update(delta);
@@ -238,15 +238,15 @@ public class HelpScreen extends View {
         return new String[] {
                 "Each level has a gate in the middle which can be rotated around the pivot.",
                 "Trolls push from the left while goats push from the right.",
-                "The goal is to maintain the equilibrium of the moments caused by both sides",
-                "so as to stop an army of goats from crossing the bridge." };
+                "Each troll and goat exerts a particular force according to its type.",
+                "The goal is to maintain the equilibrium of the moments caused by both sides." };
     }
 
     private String[] deploymentText() {
         return new String[] {
                 "Trolls and goats walk forward at a constant speed once start.",
                 "Before that, you need to deploy trolls on the left side to counter goats.",
-                "The strength of a unit is denoted as red bars (blue for speed).",
+                "The force of a unit is denoted as red bars (blue for speed).",
                 "Try to spend as few trolls as possible to achieve higher score." };
     }
 

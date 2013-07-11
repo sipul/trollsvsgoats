@@ -82,7 +82,7 @@ public class LevelSelScreen extends View {
                 levels.add(new Group(AxisLayout.vertical()).add(level).add(
                         new Shim(0, getImage("star_solid").height())));
                 level.text.update(null);
-                level.icon.update(getImage("lock"));
+                level.icon.update(getIcon("lock"));
                 level.setEnabled(false);
             } else {
                 levels.add(new Group(AxisLayout.vertical()).add(level).add(
@@ -122,9 +122,9 @@ public class LevelSelScreen extends View {
         stars.removeAll();
         for (int i = 1; i <= 3; i++) {
             if (i <= score)
-                stars.add(new Label(getImage("star_solid")));
+                stars.add(new Label(getIcon("star_solid")));
             else
-                stars.add(new Label(getImage("star_empty")));
+                stars.add(new Label(getIcon("star_empty")));
         }
     }
 

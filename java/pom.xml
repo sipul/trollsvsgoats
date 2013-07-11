@@ -17,6 +17,12 @@
       <artifactId>trollsvsgoats-core</artifactId>
       <version>${project.version}</version>
     </dependency>
+    
+    <dependency>
+      <groupId>au.edu.unimelb.csse.trollsvsgoats</groupId>
+      <artifactId>trollsvsgoats-assets</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>com.googlecode.playn</groupId>

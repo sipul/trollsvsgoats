@@ -4,7 +4,7 @@
   <parent>
     <groupId>com.googlecode.playn</groupId>
     <artifactId>playn-project</artifactId>
-    <version>1.4</version>
+    <version>1.7.2</version>
   </parent>
 
   <groupId>au.edu.unimelb.csse.trollsvsgoats</groupId>
@@ -14,10 +14,11 @@
   <name>TrollsVsGoatsGame Metaproject</name>
 
   <properties>
-    <playn.version>1.4</playn.version>
+    <playn.version>1.7.2</playn.version>
   </properties>
 
   <modules>
+    <module>assets</module>
     <module>core</module>
     <module>java</module>
     <module>html</module>

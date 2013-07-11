@@ -17,9 +17,10 @@ import au.edu.unimelb.csse.trollsvsgoats.core.model.PersistenceClient;
 
 public class MuglePersistenceClient implements PersistenceClient {
 
-    private static final String gameToken = "aecc949c-ab95-4ade-93cf-ebb414a84ff4";
-    // private static final String gameToken =
-    // "d63700f5-f095-49a4-8e39-41555ee3d0ec";
+    //mugle-new
+	//private static final String gameToken = "aecc949c-ab95-4ade-93cf-ebb414a84ff4";
+	//mugle-test
+    private static final String gameToken = "d63700f5-f095-49a4-8e39-41555ee3d0ec";
     private String instanceToken;
     private boolean isSoundEnabled = true;
     private int screenWidth;

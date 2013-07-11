@@ -232,7 +232,7 @@ public class LevelScreen extends View {
                     new Label("X").addStyles(Style.FONT.is(SUBTITLE_FONT))));
             trollCountLabels.put(type, counter);
 
-            final Button trollIcon = new Button(getImage("troll_" + type));
+            final Button trollIcon = new Button(getIcon("troll_" + type));
             table.add(trollIcon);
             trollIcons.put(type, trollIcon);
 
@@ -352,7 +352,7 @@ public class LevelScreen extends View {
                 image = getTileImages(tileSymbol).get(0);
                 Button tile = new Button().addStyles(Style.BACKGROUND
                         .is(Background.blank()));
-                GroupLayer tileLayer = tile.layer;
+                GroupLayer squareLayer = tile.layer;
 
                 switch (tileSymbol) {
                 // A segment of a lane.
@@ -365,16 +365,7 @@ public class LevelScreen extends View {
                     final int _segment = segment;
                     final int _distance = distance;
 
-                    // Adds a shim for levels which do not have units on the
-                    // first lane.
-                    if (lane == 1 && distance == 1 && !isTrollSide) {
-                        Image shimImg = getTileImages('g').get(0);
-                        Shim shim = new Shim(0, shimImg.height());
-                        shim.layer.setOrigin(0, shimImg.height());
-                        middlePanel.add(AbsoluteLayout.at(shim, _x, _y));
-                    }
-
-                    tileLayer.addListener(new Mouse.LayerAdapter() {
+                    squareLayer.addListener(new Mouse.LayerAdapter() {
                         private Square square = new Square(_lane, _segment);
 
                         // Deploy a troll at the square where the
@@ -483,13 +474,13 @@ public class LevelScreen extends View {
                 // Gate.
                 case '|':
                     isTrollSide = false;
-                    tileLayer.setDepth(1);
+                    squareLayer.setDepth(1);
 
                     if (lane == 1 && !hasPivot) {
                         pivotLocation = 0;
                         ImageLayer pivotLayer = graphics().createImageLayer(
                                 getImage("pivot"));
-                        Label pivot = new Label(getImage("pivot"));
+                        Label pivot = new Label(getIcon("pivot"));
                         pivotLayer.setDepth(2);
                         middlePanel.add(AbsoluteLayout.at(pivot, x, y
                                 + SQUARE_HEIGHT));
@@ -500,7 +491,7 @@ public class LevelScreen extends View {
                 case 'o':
                     hasPivot = true;
                     pivotLocation = lane;
-                    tileLayer.setDepth(2);
+                    squareLayer.setDepth(2);
                     break;
 
                 case 'g':// Little goat.
@@ -513,9 +504,9 @@ public class LevelScreen extends View {
                     Label goatTile = new Label().addStyles(Style.BACKGROUND
                             .is(Background.blank()));
                     if ((segment + 1) % 5 != 0) {
-                        goatTile.icon.update(getImage("segment"));
+                        goatTile.icon.update(getIcon("segment"));
                     } else
-                        goatTile.icon.update(getImage("gap"));
+                        goatTile.icon.update(getIcon("gap"));
 
                     middlePanel.add(AbsoluteLayout.at(goatTile, x, y));
 
@@ -542,9 +533,9 @@ public class LevelScreen extends View {
                     goat.setMoveAnimation(moveAnimation);
                     goat.setDefaultImage(image);
 
-                    tileLayer.setOrigin(0, image.height());
-                    tileLayer.setDepth(1);
-                    tileLayer.addListener(new Mouse.LayerAdapter() {
+                    squareLayer.setOrigin(0, image.height());
+                    squareLayer.setDepth(1);
+                    squareLayer.addListener(new Mouse.LayerAdapter() {
                         @Override
                         public void onMouseOver(MotionEvent event) {
                             if (preSelGoat != null)
@@ -571,7 +562,7 @@ public class LevelScreen extends View {
                 }
 
                 if (image != null) {
-                    tile.icon.update(image);
+                    tile.icon.update(Icons.image(image));
                     middlePanel.add(AbsoluteLayout.at(tile, x, y));
                 }
 
@@ -595,7 +586,7 @@ public class LevelScreen extends View {
                     strengthMeter = new Group(AxisLayout.horizontal())).add(
                     speedMeter = new Group(AxisLayout.horizontal())));
 
-            final Button goatIcon = new Button(getImage("goat_" + goat.type()));
+            final Button goatIcon = new Button(getIcon("goat_" + goat.type()));
             if (first) {
                 first = false;
                 preSelGoat = goatIcon.setStyles(selOn);
@@ -1139,7 +1130,7 @@ public class LevelScreen extends View {
                         .addStyles(
                                 Style.BACKGROUND.is(Background
                                         .solid(0xFF7ECEF4)))
-                        .add(new Label(getImage(badge.iconName()))
+                        .add(new Label(getIcon(badge.iconName()))
                                 .setConstraint(Constraints
                                         .fixedWidth(BadgesScreen.ICON_WIDTH)))
                         .add(new Group(AxisLayout.vertical())
@@ -1154,7 +1145,7 @@ public class LevelScreen extends View {
     }
 
     @Override
-    public void update(float delta) {
+    public void update(int delta) {
         super.update(delta);
         if (!started || paused)
             return;
@@ -1262,9 +1253,9 @@ public class LevelScreen extends View {
                 Group group = new Group(AxisLayout.vertical()).add(stars);
                 for (int i = 0; i < 3; i++) {
                     if (i < score)
-                        stars.add(new Label(getImage("star_solid")));
+                        stars.add(new Label(getIcon("star_solid")));
                     else
-                        stars.add(new Label(getImage("star_empty")));
+                        stars.add(new Label(getIcon("star_empty")));
                 }
                 if (score < 3)
                     for (String cost : scores.keys()) {
