@@ -4,20 +4,24 @@ import playn.core.PlayN;
 import playn.java.JavaPlatform;
 
 import au.edu.unimelb.csse.trollsvsgoats.core.TrollsVsGoatsGame;
+import au.edu.unimelb.csse.trollsvsgoats.core.handlers.IPlatformHandler;
 import au.edu.unimelb.csse.trollsvsgoats.java.model.LocalPersistenceClient;
 
-public class TrollsVsGoatsGameJava {
+public class TrollsVsGoatsGameJava implements IPlatformHandler {
 
+	JavaPlatform platform;
+	
+	public TrollsVsGoatsGameJava() {
+		platform = JavaPlatform.register();
+        PlayN.run(new TrollsVsGoatsGame(new LocalPersistenceClient(), this));
+	}
+        
     public static void main(String[] args) {
-        JavaPlatform platform = JavaPlatform.register();
+    	new TrollsVsGoatsGameJava();
+    }
         
-        //tripleplay 1.7.2
-        JavaPlatform.Config config = new JavaPlatform.Config();
-        config.width = 1024;
-        config.height = 720;
-        JavaPlatform.register(config);
-        //
-        
-        PlayN.run(new TrollsVsGoatsGame(new LocalPersistenceClient()));
+	@Override
+	public void setSize(int width, int height) {
+		platform.graphics().setSize(width, height);
     }
 }

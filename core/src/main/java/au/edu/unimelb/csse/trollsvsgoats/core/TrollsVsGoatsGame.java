@@ -10,14 +10,9 @@ import playn.core.*;
 import playn.core.util.Callback;
 import playn.core.util.Clock;
 import tripleplay.game.ScreenStack;
-import tripleplay.ui.Background;
 import tripleplay.ui.Icon;
 import tripleplay.ui.Icons;
-import tripleplay.ui.Interface;
-import tripleplay.ui.Root;
-import tripleplay.ui.SimpleStyles;
-import tripleplay.ui.Style;
-import tripleplay.ui.layout.AxisLayout;
+import au.edu.unimelb.csse.trollsvsgoats.core.handlers.IPlatformHandler;
 import au.edu.unimelb.csse.trollsvsgoats.core.model.*;
 import au.edu.unimelb.csse.trollsvsgoats.core.view.*;
 
@@ -50,11 +45,13 @@ public class TrollsVsGoatsGame extends Game.Default implements Game {
     private static final int UPDATE_PERIOD = 1000 / UPDATE_RATE;
     private final Clock.Source _clock = new Clock.Source(UPDATE_RATE);
     protected float _lastTime;
+    private IPlatformHandler handler;
     //
 
-    public TrollsVsGoatsGame(PersistenceClient persistence) {
+    public TrollsVsGoatsGame(PersistenceClient persistence, IPlatformHandler handler) {
     	super(UPDATE_PERIOD); // call update every 33ms (30 times per second)
         this.persistence = persistence;
+        this.handler = handler;
         this.model = new GameModel();
         screens = new View[] { mainScreen = new MainScreen(this),
                 loadScreen = new LoadingScreen(this),
@@ -84,9 +81,11 @@ public class TrollsVsGoatsGame extends Game.Default implements Game {
 
             @Override
             public void done() {
-                //TODO graphics().setSize(model.width, model.height);
             	//http://code.google.com/p/playn/source/detail?spec=svn02ad17652134fc1a47d647a9fec2e72bd7a2134b&r=2ee14ffb17a4935e3db3079fd1bcab45831d9105
-            	//issue with html - graphics().ctx().setSize(model.width, model.height);
+            	if(handler != null)
+            	{
+            		handler.setSize(model.width, model.height);
+            	}
             	
                 stack.replace(mainScreen, ScreenStack.NOOP);
             }
@@ -115,8 +114,10 @@ public class TrollsVsGoatsGame extends Game.Default implements Game {
     }
 
     public void setScreenSize(int width, int height) {
-        //TODO graphics().setSize(width, height);
-    	//issue with html - graphics().ctx().setSize(width, height);
+    	if(handler != null)
+    	{
+    		handler.setSize(width, height);
+    	}
 
         persistence.persist(model);
     }

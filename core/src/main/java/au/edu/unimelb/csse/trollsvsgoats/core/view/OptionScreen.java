@@ -84,11 +84,7 @@ public class OptionScreen extends View {
                     if (toggle.selected.get()) {
                         toggle.addStyles(Style.BACKGROUND.is(butSelBg));
                         if (width() != stringToWidth(size)) {
-                            //->TODO PlayN.graphics().setSize(stringToWidth(size),
-                            //        stringToHeight(size));
-
-
-                        	game.setScreenSize(stringToWidth(size), stringToHeight(size));
+                            game.setScreenSize(stringToWidth(size), stringToHeight(size));
                             game.refreshMainScreen();
                             game.persist();
                             wasAdded();
