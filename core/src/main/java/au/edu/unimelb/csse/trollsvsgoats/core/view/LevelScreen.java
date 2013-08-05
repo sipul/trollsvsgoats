@@ -23,7 +23,7 @@ import au.edu.unimelb.csse.trollsvsgoats.core.view.MessageBox.SimpleCallBack;
  */
 public class LevelScreen extends View {
 
-    private static final int SQUARE_HEIGHT = 40,
+    public static final int SQUARE_HEIGHT = 40,
             SQUARE_WIDTH = SQUARE_HEIGHT - 2;
     private static final int Y_SHIM = 10;
     private static final int LEFT_MARGIN = 5;
@@ -358,7 +358,7 @@ public class LevelScreen extends View {
                 // A segment of a lane.
                 case '.':
                 case ' ':
-                    final float _x = x - 5;
+                    final float _x = x;
                     final float _y = y + SQUARE_HEIGHT;
                     final boolean _isTrollSide = isTrollSide;
                     final int _lane = lane;
@@ -521,7 +521,6 @@ public class LevelScreen extends View {
                         goat.setState(State.PUSHING);
                     else
                         goat.setState(State.MOVING);
-                    x -= 5;
                     y += SQUARE_HEIGHT;
                     square.setX(x);
                     square.setY(y);
@@ -988,7 +987,6 @@ public class LevelScreen extends View {
      */
     private float updateUnits(Unit unit, float delta) {
         float moments = 0;
-        Set<Unit> retryUnits = new HashSet<Unit>();
         while (unit != null) {
             boolean pushing = false;
             if (!unit.state().equals(State.PUSHING)
@@ -1002,7 +1000,7 @@ public class LevelScreen extends View {
                         unit.setState(State.BLOCKED);
                 }
                 // If a unit can moves.
-                if (unit.updateTimer(delta) <= 0
+                if (unit.updatePosition(delta)
                         && !unit.state().equals(State.BLOCKED)) {
                     // Handles collision.
                     if (adjacent(unit, unit.front())) {
@@ -1017,16 +1015,8 @@ public class LevelScreen extends View {
                             removeUnit(unit.front());
                             removeUnit(unit);
                         }
-                        // Tries to move the previous unit after collision.
-                        else if (!retryUnits.contains(unit.front())
-                                && unit.front() != null
-                                && unit.front().timer() <= 0) {
-                            unit = unit.front();
-                            retryUnits.add(unit);
-                            continue;
-                        }
                     }
-                    if (!adjacent(unit, unit.front())
+                    if (!adjacent(unit, unit.front()) || unit.speed() == unit.front().speed()
                             || unit.state().equals(State.JUMPING)) {
                         Square s1 = unit.square();
                         // Initialises the front square.
