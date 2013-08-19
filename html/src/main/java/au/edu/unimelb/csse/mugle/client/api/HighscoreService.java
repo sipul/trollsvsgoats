@@ -17,7 +17,10 @@
 
 package au.edu.unimelb.csse.mugle.client.api;
 
+import java.util.LinkedHashMap;
+
 import au.edu.unimelb.csse.mugle.shared.api.GameTokenError;
+import au.edu.unimelb.csse.mugle.shared.multiplayer.api.InstanceTokenError;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -43,4 +46,24 @@ public interface HighscoreService extends RemoteService
      * @return The player's highest score.
      */
     public int getHighScore(String gameToken) throws GameTokenError;
+    
+    /**
+     * Gets the ranked high scores of the current game.
+     * 
+     * @param gameToken
+     *            The secret token for the current game.
+     * @param instanceToken
+     *            The secret token for the current game instance. If not null
+     *            then it's retrieved from the user game instance profile.
+     *            Otherwise it's retrieved from the user game profile.
+     * @param fromIncl
+     *            1-based inclusive start index.
+     * @param toIncl
+     *            1-based inclusive end index.
+     * @return A list of player name and high score pairs sorted descending by score.
+     * @throws GameTokenError
+     * @throws InstanceTokenError
+     */
+    public LinkedHashMap<String, Integer> getRankedHighScores(String gameToken, long fromIncl, long toIncl, String instanceToken)
+            throws GameTokenError, InstanceTokenError;
 }

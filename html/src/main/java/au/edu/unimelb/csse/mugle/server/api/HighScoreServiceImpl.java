@@ -1,10 +1,12 @@
 package au.edu.unimelb.csse.mugle.server.api;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import au.edu.unimelb.csse.mugle.client.api.HighscoreService;
 import au.edu.unimelb.csse.mugle.shared.api.GameTokenError;
+import au.edu.unimelb.csse.mugle.shared.multiplayer.api.InstanceTokenError;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -35,4 +37,15 @@ public class HighScoreServiceImpl extends RemoteServiceServlet implements
 			return 0;
 		return score;
 	}
+
+    @Override
+    public LinkedHashMap<String, Integer> getRankedHighScores(String gameToken,
+            long fromIncl, long toIncl, String instanceToken)
+            throws GameTokenError, InstanceTokenError {
+        LinkedHashMap<String, Integer> result = new LinkedHashMap<String, Integer>();
+        result.put("test1", 3);
+        result.put("test2", 2);
+        result.put("test3", 1);
+        return result;
+    }
 }
